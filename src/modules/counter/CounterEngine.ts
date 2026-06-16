@@ -2,6 +2,7 @@ import { getDatabase } from '../../db/database';
 import { incrementSessionCount, decrementSessionCount } from '../session/SessionManager';
 import { computeToDirection } from '../direction/DirectionCalculator';
 import { Session, Count, RecordCountInput } from '../../types';
+import { localTimestamp } from '../../utils/time';
 
 export class CounterEngine {
   private session: Session;
@@ -17,7 +18,7 @@ export class CounterEngine {
       input.movement,
       this.session.custom_legs ?? undefined
     );
-    const timestamp = new Date().toISOString();
+    const timestamp = localTimestamp();
     const db = await getDatabase();
     const result = await db.runAsync(
       `INSERT INTO counts (session_id, from_direction, movement, to_direction, vehicle_type, timestamp)

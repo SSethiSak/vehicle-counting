@@ -21,6 +21,7 @@ const session: Session = {
   started_at: '2026-04-15T08:30:00Z',
   ended_at: '2026-04-15T09:00:00Z',
   total_count: 2,
+  color_tag: null,
 };
 
 const counts: Count[] = [

@@ -1,6 +1,7 @@
 export type IntersectionType = '4way' | 'tee' | 'midblock' | 'roundabout' | 'custom';
+export type CrossingDirection = 'NS' | 'EW';
 export type TimePeriod = 'am_peak' | 'pm_peak' | 'off_peak';
-export type VehicleType = 'moto' | 'car' | 'rickshaw' | 'other';
+export type VehicleType = string; // user-defined; defaults: Moto, Car, Rickshaw, Other
 export type Movement = 'left' | 'straight' | 'right';
 
 export interface Session {
@@ -14,6 +15,7 @@ export interface Session {
   started_at: string;                // ISO 8601
   ended_at: string | null;
   total_count: number;
+  color_tag: string | null;          // macOS-style color label hex, or null
 }
 
 export interface Count {
@@ -33,6 +35,13 @@ export interface CreateSessionInput {
   lat: number | null;
   lng: number | null;
   custom_legs?: string[];
+}
+
+export interface PedestrianCount {
+  id: number;
+  session_id: string;
+  crossing_direction: CrossingDirection | null;
+  timestamp: string;
 }
 
 export interface RecordCountInput {

@@ -14,7 +14,7 @@ import { Session } from '../../types';
 const mockSession: Session = {
   id: 'sess_test', location_name: 'X', intersection_type: '4way',
   time_period: 'am_peak', lat: null, lng: null, custom_legs: null,
-  started_at: '2026-04-15T08:00:00Z', ended_at: null, total_count: 0,
+  started_at: '2026-04-15T08:00:00Z', ended_at: null, total_count: 0, color_tag: null,
 };
 
 beforeEach(() => {

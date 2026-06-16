@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 1060" width="960" height="1060"
+     font-family="'Helvetica Neue', Helvetica, Arial, sans-serif">
+
+  <!-- ── Arrowhead marker ──────────────────────────────────────────────────── -->
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,1 L9,5 L0,9 Z" fill="#555"/>
+    </marker>
+    <marker id="arr-back" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,1 L9,5 L0,9 Z" fill="#aaa"/>
+    </marker>
+  </defs>
+
+  <!-- ── Background ──────────────────────────────────────────────────────────── -->
+  <rect width="960" height="1060" fill="#f7f8fc" rx="0"/>
+
+  <!-- ── Title ───────────────────────────────────────────────────────────────── -->
+  <text x="480" y="30" text-anchor="middle" font-size="17" font-weight="700" fill="#1c1c1e">
+    Vehicle Counter App — User Flow
+  </text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       SHARED: START + SESSIONS LIST
+  ════════════════════════════════════════════════════════════════════════════ -->
+
+  <!-- START oval -->
+  <ellipse cx="480" cy="65" rx="130" ry="23" fill="#1c1c1e"/>
+  <text x="480" y="65" text-anchor="middle" dominant-baseline="middle"
+        font-size="13" font-weight="600" fill="#fff">🚀  App Opens</text>
+
+  <!-- START → Sessions List -->
+  <line x1="480" y1="88" x2="480" y2="104" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Sessions List (shared) -->
+  <rect x="280" y="104" width="400" height="46" rx="10"
+        fill="#e8f4ff" stroke="#4f8ef7" stroke-width="2"/>
+  <text x="480" y="127" text-anchor="middle" dominant-baseline="middle"
+        font-size="13" font-weight="700" fill="#1c1c1e">📋  Sessions List</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       LEFT BRANCH — NEW SESSION FLOW  (x-center ≈ 195)
+  ════════════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Sessions List → New Session (diagonal left) -->
+  <path d="M 340 150 Q 260 170 195 188" stroke="#555" stroke-width="1.5"
+        fill="none" marker-end="url(#arr)"/>
+  <text x="255" y="163" font-size="10" fill="#666">+ New Session</text>
+
+  <!-- New Session -->
+  <rect x="95" y="188" width="200" height="38" rx="8"
+        fill="#e8f4ff" stroke="#4f8ef7" stroke-width="1.5"/>
+  <text x="195" y="207" text-anchor="middle" dominant-baseline="middle"
+        font-size="12" font-weight="600" fill="#1c1c1e">➕  New Session</text>
+
+  <!-- New Session → Session Setup -->
+  <line x1="195" y1="226" x2="195" y2="248" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Session Setup -->
+  <rect x="80" y="248" width="230" height="82" rx="10"
+        fill="#e8f4ff" stroke="#4f8ef7" stroke-width="2"/>
+  <text x="195" y="267" text-anchor="middle" dominant-baseline="middle"
+        font-size="12" font-weight="700" fill="#1c1c1e">⚙  Session Setup</text>
+  <line x1="95" y1="276" x2="295" y2="276" stroke="#4f8ef7" stroke-width="0.7" opacity="0.5"/>
+  <text x="195" y="291" text-anchor="middle" font-size="10" fill="#555">Location · Intersection type</text>
+  <text x="195" y="306" text-anchor="middle" font-size="10" fill="#555">Time period · Vehicle types</text>
+  <text x="195" y="321" text-anchor="middle" font-size="10" fill="#555">GPS coordinates (auto)</text>
+
+  <!-- Session Setup → Counting Screen -->
+  <line x1="195" y1="330" x2="195" y2="352" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Counting Screen (taller — shows internal detail) -->
+  <rect x="75" y="352" width="240" height="134" rx="10"
+        fill="#e8f4ff" stroke="#4f8ef7" stroke-width="2"/>
+  <text x="195" y="372" text-anchor="middle" dominant-baseline="middle"
+        font-size="12" font-weight="700" fill="#1c1c1e">🔢  Counting Screen</text>
+  <line x1="90" y1="381" x2="300" y2="381" stroke="#4f8ef7" stroke-width="0.7" opacity="0.5"/>
+  <!-- Pedestrian bar highlight -->
+  <rect x="88" y="385" width="214" height="22" rx="5" fill="#e8fff2" stroke="#30d158" stroke-width="1" opacity="0.8"/>
+  <text x="195" y="396" text-anchor="middle" dominant-baseline="middle"
+        font-size="10" fill="#1a7a3a">👣  Tap pedestrian bar → count</text>
+  <text x="195" y="418" text-anchor="middle" font-size="10" fill="#555">🚗  Drag vehicle type → count</text>
+  <text x="195" y="434" text-anchor="middle" font-size="10" fill="#555">⏸  Pause  /  ▶ Resume  /  ↩ Undo</text>
+  <text x="195" y="450" text-anchor="middle" font-size="10" fill="#cc3a30">■  End Session  →  goes to Review</text>
+  <text x="195" y="469" text-anchor="middle" font-size="10" fill="#888">Timer · vehicle counter · ped counter</text>
+
+  <!-- Counting → Session Review -->
+  <line x1="195" y1="486" x2="195" y2="508" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Session Review -->
+  <rect x="75" y="508" width="240" height="88" rx="10"
+        fill="#e8f4ff" stroke="#4f8ef7" stroke-width="2"/>
+  <text x="195" y="527" text-anchor="middle" dominant-baseline="middle"
+        font-size="12" font-weight="700" fill="#1c1c1e">📊  Session Review</text>
+  <line x1="90" y1="536" x2="300" y2="536" stroke="#4f8ef7" stroke-width="0.7" opacity="0.5"/>
+  <text x="195" y="551" text-anchor="middle" font-size="10" fill="#555">Summary card (total · duration · top vehicle)</text>
+  <text x="195" y="566" text-anchor="middle" font-size="10" fill="#555">Bar charts: vehicle type · movement · approach</text>
+  <text x="195" y="581" text-anchor="middle" font-size="10" fill="#1a7a3a">👣 Pedestrian summary (if counts exist)</text>
+
+  <!-- Session Review → Export -->
+  <line x1="195" y1="596" x2="195" y2="618" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Export -->
+  <rect x="75" y="618" width="240" height="60" rx="10"
+        fill="#efffef" stroke="#30d158" stroke-width="1.5"/>
+  <text x="195" y="637" text-anchor="middle" dominant-baseline="middle"
+        font-size="12" font-weight="700" fill="#1c1c1e">📤  Export</text>
+  <line x1="90" y1="646" x2="300" y2="646" stroke="#30d158" stroke-width="0.7" opacity="0.5"/>
+  <text x="195" y="660" text-anchor="middle" font-size="10" fill="#555">CSV · Excel (3 sheets) · JSON · PDF</text>
+  <text x="195" y="674" text-anchor="middle" font-size="10" fill="#1a7a3a">👣 Export Pedestrian CSV (if exists)</text>
+
+  <!-- Export → Go to Home → Sessions List (left-side loop) -->
+  <path d="M 75 648 Q 30 648 30 127 Q 30 104 280 127"
+        stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"
+        fill="none" marker-end="url(#arr-back)"/>
+  <text x="18" y="380" text-anchor="middle" font-size="10" fill="#999"
+        transform="rotate(-90, 18, 380)">⌂  Go to Home</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       RIGHT BRANCH — SESSION MANAGEMENT  (x-center ≈ 745)
+  ════════════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Sessions List → Long-press (diagonal right) -->
+  <path d="M 620 150 Q 700 170 755 188" stroke="#555" stroke-width="1.5"
+        fill="none" marker-end="url(#arr)"/>
+  <text x="685" y="162" font-size="10" fill="#666">Long-press</text>
+
+  <!-- Long-press Session -->
+  <rect x="650" y="188" width="210" height="38" rx="8"
+        fill="#f5eeff" stroke="#bf5af2" stroke-width="1.5"/>
+  <text x="755" y="207" text-anchor="middle" dominant-baseline="middle"
+        font-size="12" font-weight="600" fill="#1c1c1e">Long-press Session</text>
+
+  <!-- Long-press → Context Menu -->
+  <line x1="755" y1="226" x2="755" y2="248" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Context Menu -->
+  <rect x="640" y="248" width="230" height="42" rx="10"
+        fill="#f5eeff" stroke="#bf5af2" stroke-width="2"/>
+  <text x="755" y="264" text-anchor="middle" dominant-baseline="middle"
+        font-size="12" font-weight="700" fill="#1c1c1e">Context Menu</text>
+  <text x="755" y="281" text-anchor="middle"
+        font-size="9" fill="#7a5a9a">✎ Rename  ·  ⬤ Color  ·  👣 Ped  ·  ☑ Select  ·  ⊗ Delete</text>
+
+  <!-- Context Menu → 5 options (arrows fanning down) -->
+  <!-- Rename -->
+  <path d="M 700 290 L 670 330" stroke="#555" stroke-width="1.2" fill="none" marker-end="url(#arr)"/>
+  <rect x="615" y="330" width="110" height="32" rx="7"
+        fill="#f5eeff" stroke="#bf5af2" stroke-width="1.2"/>
+  <text x="670" y="346" text-anchor="middle" dominant-baseline="middle"
+        font-size="11" fill="#1c1c1e">✎  Rename</text>
+
+  <!-- Color Tag -->
+  <path d="M 730 290 L 755 330" stroke="#555" stroke-width="1.2" fill="none" marker-end="url(#arr)"/>
+  <rect x="700" y="330" width="110" height="32" rx="7"
+        fill="#f5eeff" stroke="#bf5af2" stroke-width="1.2"/>
+  <text x="755" y="346" text-anchor="middle" dominant-baseline="middle"
+        font-size="11" fill="#1c1c1e">⬤  Color Tag</text>
+
+  <!-- Select -->
+  <path d="M 700 290 L 670 385" stroke="#555" stroke-width="1.2" fill="none" marker-end="url(#arr)"/>
+  <rect x="615" y="385" width="110" height="32" rx="7"
+        fill="#f5eeff" stroke="#bf5af2" stroke-width="1.2"/>
+  <text x="670" y="401" text-anchor="middle" dominant-baseline="middle"
+        font-size="11" fill="#1c1c1e">☑  Select</text>
+
+  <!-- Delete -->
+  <path d="M 810 290 L 838 385" stroke="#555" stroke-width="1.2" fill="none" marker-end="url(#arr)"/>
+  <rect x="783" y="385" width="110" height="32" rx="7"
+        fill="#fff0ef" stroke="#ff453a" stroke-width="1.5"/>
+  <text x="838" y="401" text-anchor="middle" dominant-baseline="middle"
+        font-size="11" fill="#cc2a1e">⊗  Delete</text>
+
+  <!-- Ped Count (middle) -->
+  <path d="M 755 290 L 755 385" stroke="#555" stroke-width="1.2" fill="none" marker-end="url(#arr)"/>
+  <rect x="695" y="385" width="120" height="32" rx="7"
+        fill="#e8fff2" stroke="#30d158" stroke-width="1.5"/>
+  <text x="755" y="401" text-anchor="middle" dominant-baseline="middle"
+        font-size="11" fill="#1a7a3a">👣  Ped Count</text>
+
+  <!-- Ped Count → Pedestrian Counter Screen -->
+  <line x1="755" y1="417" x2="755" y2="443" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Pedestrian Counter Screen -->
+  <rect x="635" y="443" width="240" height="100" rx="10"
+        fill="#e8fff2" stroke="#30d158" stroke-width="2"/>
+  <text x="755" y="462" text-anchor="middle" dominant-baseline="middle"
+        font-size="12" font-weight="700" fill="#1c1c1e">👣  Pedestrian Counter</text>
+  <line x1="650" y1="471" x2="860" y2="471" stroke="#30d158" stroke-width="0.7" opacity="0.5"/>
+  <text x="755" y="487" text-anchor="middle" font-size="10" fill="#555">Large TAP button (full-width)</text>
+  <text x="755" y="502" text-anchor="middle" font-size="10" fill="#555">N↕S / E↔W crossing direction</text>
+  <text x="755" y="517" text-anchor="middle" font-size="10" fill="#555">↩ Undo  ·  ⏸ Pause  ·  Done</text>
+  <text x="755" y="532" text-anchor="middle" font-size="10" fill="#888">Linked to session by session_id</text>
+
+  <!-- Edit Mode (below Select) -->
+  <line x1="670" y1="417" x2="670" y2="455" stroke="#555" stroke-width="1.2" marker-end="url(#arr)"/>
+  <rect x="615" y="455" width="110" height="48" rx="7"
+        fill="#f5eeff" stroke="#bf5af2" stroke-width="1.2"/>
+  <text x="670" y="472" text-anchor="middle" dominant-baseline="middle"
+        font-size="10" font-weight="600" fill="#1c1c1e">Edit Mode</text>
+  <text x="670" y="487" text-anchor="middle" font-size="9" fill="#555">Bulk Color Tag</text>
+  <text x="670" y="499" text-anchor="middle" font-size="9" fill="#cc2a1e">Bulk Delete</text>
+
+  <!-- Return arrows to Sessions List (right-side loop) -->
+  <path d="M 880 401 Q 935 401 935 127 Q 935 104 680 127"
+        stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"
+        fill="none" marker-end="url(#arr-back)"/>
+  <text x="948" y="290" text-anchor="middle" font-size="10" fill="#999"
+        transform="rotate(90, 948, 290)">Returns to Sessions List</text>
+
+  <!-- ── Legend ──────────────────────────────────────────────────────────────── -->
+  <rect x="60" y="760" width="840" height="86" rx="10"
+        fill="white" stroke="#ddd" stroke-width="1"/>
+  <text x="480" y="782" text-anchor="middle" font-size="12" font-weight="700" fill="#1c1c1e">Legend</text>
+
+  <rect x="80"  y="798" width="14" height="14" rx="3" fill="#e8f4ff"  stroke="#4f8ef7"  stroke-width="1.5"/>
+  <text x="100" y="810" font-size="11" fill="#555">Main app flow</text>
+
+  <rect x="230" y="798" width="14" height="14" rx="3" fill="#e8fff2"  stroke="#30d158"  stroke-width="1.5"/>
+  <text x="250" y="810" font-size="11" fill="#555">Pedestrian feature</text>
+
+  <rect x="410" y="798" width="14" height="14" rx="3" fill="#f5eeff"  stroke="#bf5af2"  stroke-width="1.5"/>
+  <text x="430" y="810" font-size="11" fill="#555">Session management</text>
+
+  <rect x="610" y="798" width="14" height="14" rx="3" fill="#fff0ef"  stroke="#ff453a"  stroke-width="1.5"/>
+  <text x="630" y="810" font-size="11" fill="#555">Destructive action</text>
+
+  <line x1="80" y1="832" x2="110" y2="832" stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-back)"/>
+  <text x="120" y="836" font-size="11" fill="#555">Returns to Sessions List</text>
+
+  <line x1="350" y1="832" x2="380" y2="832" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="390" y="836" font-size="11" fill="#555">Navigation / data flow</text>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────────── -->
+  <text x="480" y="870" text-anchor="middle" font-size="10" fill="#aaa">
+    Vehicle Counter App · feature/custom-vehicle-types-export-downloads
+  </text>
+</svg>

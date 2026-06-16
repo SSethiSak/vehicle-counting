@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Alert,
+  View, Text, TouchableOpacity, StyleSheet, Alert, useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -8,14 +8,24 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { CounterEngine } from '../modules/counter/CounterEngine';
 import { endSession, getSession } from '../modules/session/SessionManager';
-import VehicleTypePicker from '../components/VehicleTypePicker';
-import UndoBar from '../components/UndoBar';
+import { getVehicleTypes, addVehicleType, deleteVehicleType } from '../modules/vehicleType/VehicleTypeManager';
+import {
+  addPedestrianCount, undoLastPedestrianCount, countSessionPedestrians,
+} from '../modules/pedestrian/PedestrianManager';
+import {
+  GestureConfig, DEFAULT_GESTURE_CONFIG, getGestureConfig,
+} from '../modules/gesture/GestureConfig';
+import {
+  loadHapticSetting, hapticSelection,
+} from '../modules/haptics/HapticService';
 import IntersectionDragMap from '../components/IntersectionDragMap';
-import { useResponsiveLayout } from '../hooks/useResponsiveLayout';
-import { Session, Movement, VehicleType } from '../types';
+import ManageVehicleTypesModal from '../components/ManageVehicleTypesModal';
+import { Session, Movement } from '../types';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { useTheme } from '../context/ThemeContext';
+import { ThemeTokens } from '../theme';
 
-type Nav = NativeStackNavigationProp<RootStackParamList, 'Counting'>;
+type Nav   = NativeStackNavigationProp<RootStackParamList, 'Counting'>;
 type Route = RouteProp<RootStackParamList, 'Counting'>;
 
 function formatElapsed(seconds: number): string {
@@ -29,36 +39,68 @@ export default function CountingScreen() {
   const navigation = useNavigation<Nav>();
   const { params } = useRoute<Route>();
   const session: Session = params.session;
-  const { isTablet } = useResponsiveLayout();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
+
+  const G = useTheme();
+  const styles = useMemo(() => createStyles(G), [G]);
 
   const engineRef = useRef(new CounterEngine(session));
-  const [vehicleType, setVehicleType] = useState<VehicleType>('moto');
-  const [total, setTotal] = useState(session.total_count);
-  const [elapsed, setElapsed] = useState(0);
+  const [total,         setTotal]         = useState(session.total_count);
+  const [elapsed,       setElapsed]       = useState(0);
+  const [paused,        setPaused]        = useState(false);
+  const [vehicleTypes,  setVehicleTypes]  = useState<string[]>(['Moto', 'Car', 'Rickshaw', 'Other']);
+  const [manageVisible, setManageVisible] = useState(false);
+  const [gestureConfig, setGestureConfig] = useState<GestureConfig>(DEFAULT_GESTURE_CONFIG);
+
+  const [pedTotal, setPedTotal] = useState(0);
 
   useEffect(() => {
+    countSessionPedestrians(session.id).then(setPedTotal);
+  }, [session.id]);
+
+  const handlePedTap = async () => {
+    await addPedestrianCount(session.id, null);
+    setPedTotal((n) => n + 1);
+  };
+
+  const handlePedUndo = async () => {
+    const ok = await undoLastPedestrianCount(session.id);
+    if (ok) setPedTotal((n) => Math.max(0, n - 1));
+  };
+
+  useEffect(() => {
+    if (paused) return;
     const interval = setInterval(() => setElapsed((e) => e + 1), 1000);
     return () => clearInterval(interval);
+  }, [paused]);
+
+  const loadVehicleTypes = useCallback(async () => {
+    const types = await getVehicleTypes();
+    if (types.length > 0) setVehicleTypes(types);
   }, []);
 
-  const handleDrag = async (from: string, movement: Movement) => {
+  useEffect(() => {
+    loadVehicleTypes();
+    getGestureConfig().then(setGestureConfig);
+    loadHapticSetting();
+  }, [loadVehicleTypes]);
+
+  const handleDrag = async (from: string, movement: Movement, vehicleType: string) => {
     await engineRef.current.record({ from_direction: from, movement, vehicle_type: vehicleType });
-    const updated = await getSession(session.id);
-    setTotal(updated.total_count);
+    setTotal((await getSession(session.id)).total_count);
   };
 
   const handleUndo = async () => {
-    const undone = await engineRef.current.undo();
-    if (undone) {
-      const updated = await getSession(session.id);
-      setTotal(updated.total_count);
+    if (await engineRef.current.undo()) {
+      setTotal((await getSession(session.id)).total_count);
     }
   };
 
   const handleEndSession = () => {
     Alert.alert(
       'End Session?',
-      `You have counted ${total} vehicles. End this session?`,
+      `You have counted ${total} vehicles and ${pedTotal} pedestrian${pedTotal !== 1 ? 's' : ''}. End this session?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -74,55 +116,80 @@ export default function CountingScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+
+      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      <View style={[styles.header, isLandscape && styles.headerLandscape]}>
         <Text style={styles.locationName} numberOfLines={1}>{session.location_name}</Text>
-        <Text style={styles.timer}>{formatElapsed(elapsed)}</Text>
+        <Text style={[styles.timer, paused && styles.timerPaused]}>{formatElapsed(elapsed)}</Text>
+        <TouchableOpacity style={styles.pauseBtn} onPress={() => { hapticSelection(); setPaused((p) => !p); }}>
+          <Text style={styles.pauseBtnText}>{paused ? '▶' : '⏸'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.manageBtn} onPress={() => { hapticSelection(); setManageVisible(true); }}>
+          <Text style={styles.manageBtnText}>⚙</Text>
+        </TouchableOpacity>
         <TouchableOpacity testID="end-session-btn" style={styles.endBtn} onPress={handleEndSession}>
           <Text style={styles.endBtnText}>■</Text>
         </TouchableOpacity>
       </View>
 
-      {isTablet ? (
-        <View style={styles.tabletLayout}>
-          <View style={styles.tabletSidebar}>
-            <View style={styles.section}>
-              <Text style={styles.sectionLabel}>VEHICLE TYPE</Text>
-              <VehicleTypePicker selected={vehicleType} onSelect={setVehicleType} />
-            </View>
-          </View>
-          <View style={styles.tabletMain}>
-            <IntersectionDragMap legs={session.custom_legs} onDrag={handleDrag} />
-            <UndoBar total={total} onUndo={handleUndo} />
-          </View>
-        </View>
-      ) : (
-        <View style={styles.phoneLayout}>
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>VEHICLE TYPE</Text>
-            <VehicleTypePicker selected={vehicleType} onSelect={setVehicleType} />
-          </View>
-          <IntersectionDragMap legs={session.custom_legs} onDrag={handleDrag} />
-          <UndoBar total={total} onUndo={handleUndo} />
-        </View>
-      )}
+      {/* ── Map fills everything below the header ────────────────────────────── */}
+      <View style={styles.mapContainer}>
+        <IntersectionDragMap
+          legs={session.custom_legs}
+          vehicleTypes={vehicleTypes}
+          onDrag={handleDrag}
+          paused={paused}
+          gestureConfig={gestureConfig}
+          pedTotal={pedTotal}
+          onPedestrian={handlePedTap}
+          total={total}
+          onUndo={handleUndo}
+          onPedUndo={handlePedUndo}
+        />
+      </View>
+
+      <ManageVehicleTypesModal
+        visible={manageVisible}
+        vehicleTypes={vehicleTypes}
+        onAdd={async (n) => { await addVehicleType(n); await loadVehicleTypes(); }}
+        onDelete={async (n) => { await deleteVehicleType(n); await loadVehicleTypes(); }}
+        onClose={() => setManageVisible(false)}
+      />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0d1117' },
-  header: {
-    flexDirection: 'row', alignItems: 'center', padding: 12,
-    borderBottomWidth: 1, borderBottomColor: '#1e2a3a',
-  },
-  locationName: { flex: 1, color: '#4f8ef7', fontWeight: 'bold', fontSize: 14 },
-  timer: { color: '#888', fontSize: 13, marginHorizontal: 8 },
-  endBtn: { padding: 6, backgroundColor: '#3a1a1a', borderRadius: 6 },
-  endBtnText: { color: '#f44336', fontSize: 16 },
-  phoneLayout: { flex: 1, padding: 16, gap: 12 },
-  tabletLayout: { flex: 1, flexDirection: 'row' },
-  tabletSidebar: { width: 260, padding: 16, borderRightWidth: 1, borderRightColor: '#1e2a3a', gap: 12 },
-  tabletMain: { flex: 1, padding: 16, gap: 12 },
-  section: { gap: 6 },
-  sectionLabel: { color: '#888', fontSize: 11, fontWeight: 'bold', letterSpacing: 1 },
-});
+function createStyles(G: ThemeTokens) {
+  return StyleSheet.create({
+    container:   { flex: 1, backgroundColor: G.bg },
+    mapContainer: { flex: 1, padding: 8, minHeight: 0 },
+
+    header: {
+      flexDirection: 'row', alignItems: 'center',
+      paddingHorizontal: 14, paddingVertical: 10,
+      borderBottomWidth: 1, borderBottomColor: G.rim1,
+      backgroundColor: G.glass2,
+    },
+    headerLandscape: { paddingVertical: 5 },
+    locationName: { flex: 1, color: G.blue, fontWeight: '700', fontSize: 14 },
+    timer: { color: G.textSub, fontSize: 13, marginHorizontal: 8, fontVariant: ['tabular-nums'] },
+    timerPaused: { color: G.orange },
+    pauseBtn: {
+      padding: 7, marginRight: 6,
+      backgroundColor: G.glass2, borderRadius: G.radiusXs,
+      borderWidth: 1, borderColor: G.rim1,
+    },
+    pauseBtnText: { color: G.blue, fontSize: 15 },
+    manageBtn: {
+      padding: 7, marginRight: 6,
+      backgroundColor: G.glass2, borderRadius: G.radiusXs,
+      borderWidth: 1, borderColor: G.rim1,
+    },
+    manageBtnText: { color: G.textSub, fontSize: 15 },
+    endBtn: {
+      padding: 7, backgroundColor: G.redGlass, borderRadius: G.radiusXs,
+      borderWidth: 1, borderColor: G.redRim,
+    },
+    endBtnText: { color: G.red, fontSize: 15 },
+  });
+}

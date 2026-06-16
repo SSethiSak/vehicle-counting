@@ -1,11 +1,12 @@
 import { getDatabase } from '../../db/database';
 import { Session, CreateSessionInput } from '../../types';
+import { localTimestamp } from '../../utils/time';
 
 function generateSessionId(): string {
   const now = new Date();
-  const date = now.toISOString().replace(/[-:T.Z]/g, '').slice(0, 15);
-  const ms = now.getMilliseconds().toString().padStart(3, '0');
-  return `sess_${date}_${ms}`;
+  const ts  = localTimestamp().replace(/[-: ]/g, '').slice(0, 14);
+  const ms  = now.getMilliseconds().toString().padStart(3, '0');
+  return `sess_${ts}_${ms}`;
 }
 
 function deserializeSession(row: Record<string, unknown>): Session {
@@ -30,6 +31,7 @@ function deserializeSession(row: Record<string, unknown>): Session {
     ended_at:          row.ended_at as string | null,
     total_count:       Number(row.total_count),
     custom_legs,
+    color_tag:         (row.color_tag as string | null) ?? null,
   };
 }
 
@@ -43,9 +45,10 @@ export async function createSession(input: CreateSessionInput): Promise<Session>
     lat: input.lat,
     lng: input.lng,
     custom_legs: input.custom_legs ?? null,
-    started_at: new Date().toISOString(),
+    started_at: localTimestamp(),
     ended_at: null,
     total_count: 0,
+    color_tag: null,
   };
   await db.runAsync(
     `INSERT INTO sessions
@@ -63,7 +66,7 @@ export async function createSession(input: CreateSessionInput): Promise<Session>
 
 export async function endSession(sessionId: string): Promise<Session> {
   const db = await getDatabase();
-  const ended_at = new Date().toISOString();
+  const ended_at = localTimestamp();
   const result = await db.runAsync(
     `UPDATE sessions SET ended_at = ? WHERE id = ?`,
     [ended_at, sessionId]
@@ -105,5 +108,30 @@ export async function decrementSessionCount(sessionId: string): Promise<void> {
   await db.runAsync(
     `UPDATE sessions SET total_count = MAX(0, total_count - 1) WHERE id = ?`,
     [sessionId]
+  );
+}
+
+export async function deleteSession(sessionId: string): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(`DELETE FROM counts WHERE session_id = ?`, [sessionId]);
+  await db.runAsync(`DELETE FROM sessions WHERE id = ?`, [sessionId]);
+}
+
+export async function updateSessionColorTag(
+  sessionId: string,
+  colorTag: string | null,
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    `UPDATE sessions SET color_tag = ? WHERE id = ?`,
+    [colorTag, sessionId],
+  );
+}
+
+export async function renameSession(sessionId: string, newName: string): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    `UPDATE sessions SET location_name = ? WHERE id = ?`,
+    [newName.trim(), sessionId],
   );
 }

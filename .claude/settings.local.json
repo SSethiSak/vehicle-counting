@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "PowerShell(npx tsc --noEmit 2>&1)",
+      "Bash(npm run *)",
+      "PowerShell(Get-ChildItem \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" -ErrorAction SilentlyContinue; Get-ChildItem \"$env:APPDATA\\\\npm\\\\npm.cmd\" -ErrorAction SilentlyContinue; Get-ChildItem \"$env:ProgramFiles\\\\nodejs\" -ErrorAction SilentlyContinue | Select-Object -First 5)",
+      "PowerShell(cmd /c \"where npm 2>nul\")",
+      "Bash(git -C \"d:/vehicle-counting\" checkout -b feature/custom-vehicle-types-export-downloads)",
+      "Bash(git -C d:/vehicle-counting commit -m ' *)",
+      "Bash(git -C \"d:/vehicle-counting\" push -u origin feature/custom-vehicle-types-export-downloads)",
+      "Bash(git -C \"d:/vehicle-counting\" remote -v)",
+      "Bash(npx expo *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}

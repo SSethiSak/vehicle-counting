@@ -1,0 +1,100 @@
+%%{init: {'theme': 'base', 'themeVariables': {
+  'primaryColor': '#e8f4ff',
+  'primaryBorderColor': '#4f8ef7',
+  'primaryTextColor': '#1c1c1e',
+  'lineColor': '#555555',
+  'secondaryColor': '#f5eeff',
+  'tertiaryColor': '#e8fff2'
+}}}%%
+flowchart TD
+
+  classDef main     fill:#e8f4ff,stroke:#4f8ef7,stroke-width:2px,color:#1c1c1e
+  classDef green    fill:#e8fff2,stroke:#30d158,stroke-width:2px,color:#1c1c1e
+  classDef red      fill:#fff0ef,stroke:#ff453a,stroke-width:2px,color:#1c1c1e
+  classDef purple   fill:#f5eeff,stroke:#bf5af2,stroke-width:2px,color:#1c1c1e
+  classDef dark     fill:#1c1c1e,stroke:#1c1c1e,color:#ffffff
+  classDef export   fill:#f0fff4,stroke:#30d158,stroke-width:1.5px,color:#1c1c1e
+  classDef muted    fill:#f5f5f5,stroke:#aaaaaa,stroke-width:1px,color:#444444
+
+  START(["🚀  App Opens"]):::dark
+  SL["📋  Sessions List"]:::main
+
+  START --> SL
+
+  %% ── NEW SESSION FLOW ──────────────────────────────────────────
+  NS["➕  New Session"]:::main
+  SS["⚙  Session Setup
+  ─────────────────
+  • Location name
+  • Intersection type  (4-way / T / Midblock / Custom)
+  • Time period  (AM Peak / PM Peak / Off-Peak)
+  • Vehicle types  (add / remove before starting)"]:::main
+
+  CS["🔢  Counting Screen
+  ─────────────────────────
+  🚗  Drag vehicle type → record count
+  👣  Tap pedestrian bar → record crossing
+  ⏸  Pause  /  ▶ Resume
+  ↩  Undo last count
+  ■  End Session"]:::main
+
+  SR["📊  Session Review
+  ─────────────────────────
+  Summary card  (total · duration · top vehicle · top move)
+  Bar charts  (vehicle type · movement · approach)
+  👣 Pedestrian summary  (if any counts recorded)"]:::main
+
+  EX["📤  Export
+  ─────────────────────
+  CSV  ·  Excel  ·  JSON  ·  PDF Report
+  Export Pedestrian CSV  (if ped data exists)"]:::export
+
+  HOME["🏠  Go to Home"]:::muted
+
+  SL -->|"+ New Session"| NS
+  NS --> SS
+  SS --> CS
+  CS -->|"End Session"| SR
+  SR --> EX
+  SR --> HOME
+  HOME --> SL
+
+  %% ── SESSION MANAGEMENT ───────────────────────────────────────
+  LP["Long-press Session"]:::purple
+  CM["📋  Context Menu"]:::purple
+
+  RN["✎  Rename
+  Pre-filled sheet · confirm to save"]:::purple
+
+  CT["⬤  Color Tag
+  None · Red · Orange · Yellow
+  Green · Blue · Purple · Gray"]:::purple
+
+  PC["👣  Pedestrian Count
+  Opens Pedestrian Counter Screen"]:::green
+
+  SEL["☑  Select  →  Edit Mode
+  Tap rows to multi-select
+  ── Color Tag (bulk)
+  ── Delete (bulk)"]:::purple
+
+  DEL{"⊗  Delete Session?"}:::red
+
+  PCS["👣  Pedestrian Counter
+  ─────────────────────────────
+  Green TAP button  (full-width tap zone)
+  N↕S  /  E↔W  crossing direction
+  ↩  Undo  ·  ⏸  Pause  /  ▶ Resume
+  Shows live count · last-tap timestamp
+  Counts linked by session_id"]:::green
+
+  SL -->|"Long-press"| LP
+  LP --> CM
+  CM -->|"Rename"| RN     --> SL
+  CM -->|"Color Tag"| CT  --> SL
+  CM -->|"Ped Count"| PC  --> PCS
+  PCS -->|"Done"| SL
+  CM -->|"Select"| SEL    --> SL
+  CM -->|"Delete"| DEL
+  DEL -->|"Confirm"| SL
+  DEL -->|"Cancel"| CM

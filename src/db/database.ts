@@ -41,5 +41,34 @@ async function _initSchema(db: SQLite.SQLiteDatabase): Promise<void> {
       vehicle_type   TEXT NOT NULL,
       timestamp      TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS vehicle_types (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      name       TEXT NOT NULL UNIQUE,
+      sort_order INTEGER NOT NULL DEFAULT 0
+    );
+
+    INSERT OR IGNORE INTO vehicle_types (name, sort_order) VALUES
+      ('Moto', 0), ('Car', 1), ('Rickshaw', 2), ('Other', 3);
+
+    CREATE TABLE IF NOT EXISTS app_settings (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+  `);
+  // Migration: add color_tag column to existing installs
+  try {
+    await db.execAsync(`ALTER TABLE sessions ADD COLUMN color_tag TEXT;`);
+  } catch { /* already exists */ }
+
+  // Pedestrian counts table (new installs get it via CREATE IF NOT EXISTS above;
+  // existing installs need this separate statement)
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS pedestrian_counts (
+      id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_id         TEXT NOT NULL REFERENCES sessions(id),
+      crossing_direction TEXT,
+      timestamp          TEXT NOT NULL
+    );
   `);
 }
